@@ -76,12 +76,18 @@ export class GithubService {
     // 2. Iterate through all items in the repo
     for (const item of treeData.tree) {
       if (item.type === 'tree') {
+        if (item.path.includes('node_modules')) {
+          continue;
+        }
         // It's a folder
         filesAndFolders.push({
           path: item.path,
           type: 'folder',
         });
       } else if (item.type === 'blob') {
+        if (!item.path.endsWith('.ts')) {
+          continue;
+        }
         // It's a file — fetch its content using its SHA
         const { data: blob } = await octokit.rest.git.getBlob({
           owner,
